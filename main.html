@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>market-raider — BearChecker · Market cycle assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --bg-panel: #13171e;
+      --bg-hover: #1a1f28;
+      --border: #252b36;
+      --accent: #f59e0b;
+      --accent-dim: #d97706;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --text-dim: #64748b;
+      --glow: rgba(245, 158, 11, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 1.5rem; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .logo {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 600;
+      font-size: 1.6rem;
+      color: var(--accent);
+    }
+    .tagline { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem; }
+    .header-right { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .addr { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--green); max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+    input.contract { width: 240px; padding: 0.5rem 0.65rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text); border-radius: 6px; }
+    .btn {
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 500;
