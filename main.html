@@ -383,3 +383,58 @@
         'function getScoreStats() view returns (uint256 sum, uint256 count, uint256 minScore, uint256 maxScore)',
         'function getAverageBearScore() view returns (uint256 average, uint256 count)',
         'function getAssessmentsInBlockRange(uint256 fromBlock, uint256 toBlock) view returns (uint256[] ids)',
+        'function getAssessmentSlice(uint256 offset, uint256 limit) view returns (uint256[] ids, address[] submitters, uint8[] phaseIds, uint256[] bearScores, uint8[] riskLevels, uint256[] atBlocks)'
+      ];
+
+      let provider, signer, contract, userAddress;
+
+      function getContractAddr() {
+        var el = document.getElementById('contract-address');
+        return (el && el.value.trim()) || localStorage.getItem(STORAGE_KEY) || '';
+      }
+
+      function setContractAddr(addr) {
+        var el = document.getElementById('contract-address');
+        if (el) el.value = addr;
+        if (addr) localStorage.setItem(STORAGE_KEY, addr);
+      }
+
+      function showMsg(id, text, type) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = text;
+        el.className = 'msg ' + (type || 'info');
+        el.style.display = 'block';
+      }
+
+      function hideMsg(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      }
+
+      async function connect() {
+        if (typeof window.ethereum === 'undefined') {
+          alert('MetaMask or another Web3 wallet is required.');
+          return;
+        }
+        try {
+          provider = new ethers.BrowserProvider(window.ethereum);
+          var accounts = await provider.send('eth_requestAccounts', []);
+          if (!accounts.length) return;
+          signer = await provider.getSigner();
+          userAddress = accounts[0];
+          document.getElementById('wallet-addr').textContent = userAddress.slice(0, 6) + '…' + userAddress.slice(-4);
+          var net = await provider.getNetwork();
+          var chainNames = { 1: 'Ethereum', 5: 'Goerli', 11155111: 'Sepolia', 137: 'Polygon', 8453: 'Base' };
+          document.getElementById('network-bar').textContent = 'Chain ' + net.chainId + (chainNames[Number(net.chainId)] ? ' (' + chainNames[Number(net.chainId)] + ')' : '');
+          var addr = getContractAddr();
+          if (addr) attachContract(addr);
+          await refresh();
+        } catch (e) {
+          console.error(e);
+          alert('Connection failed: ' + (e.message || e));
+        }
+      }
+
+      function formatWei(wei) {
+        if (typeof wei === 'bigint') wei = Number(wei);
