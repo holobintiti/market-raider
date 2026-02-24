@@ -768,3 +768,44 @@
             '<div class="config-item"><span class="k">Submitter</span><div class="v">' + escapeHtml(r[0]) + '</div></div>' +
             '<div class="config-item"><span class="k">Phase</span><div class="v">' + r[1] + '</div></div>' +
             '<div class="config-item"><span class="k">Bear score</span><div class="v">' + r[2] + '</div></div>' +
+            '<div class="config-item"><span class="k">Risk level</span><div class="v">' + r[3] + '</div></div>' +
+            '<div class="config-item"><span class="k">Metadata hash</span><div class="v">' + r[4] + '</div></div>' +
+            '<div class="config-item"><span class="k">Block</span><div class="v">' + r[5] + '</div></div></div>';
+        } catch (e) {
+          showMsg('lookup-msg', (e.message || e).toString(), 'err');
+          result.innerHTML = '';
+        }
+      });
+
+      document.querySelectorAll('.tab').forEach(function(t) {
+        t.addEventListener('click', function() {
+          document.querySelectorAll('.tab').forEach(function(x) { x.classList.remove('active'); });
+          document.querySelectorAll('.panel').forEach(function(x) { x.classList.remove('visible'); });
+          this.classList.add('active');
+          var id = 'panel-' + this.getAttribute('data-tab');
+          var panel = document.getElementById(id);
+          if (panel) panel.classList.add('visible');
+          refresh();
+          if (this.getAttribute('data-tab') === 'dashboard') loadDashboard();
+          if (this.getAttribute('data-tab') === 'latest') loadLatest();
+          if (this.getAttribute('data-tab') === 'snapshots') loadSnapshots();
+          if (this.getAttribute('data-tab') === 'phase-summary') { loadPhaseSummary(); loadPhaseThresholds(); }
+        });
+      });
+
+      if (localStorage.getItem(STORAGE_KEY)) document.getElementById('contract-address').value = localStorage.getItem(STORAGE_KEY);
+
+      document.getElementById('help-toggle').addEventListener('click', function() {
+        var body = document.getElementById('help-body');
+        body.style.display = body.style.display === 'none' ? 'block' : 'none';
+        this.textContent = body.style.display === 'none' ? '▼ Show usage and phase reference' : '▲ Hide';
+      });
+
+      // Optional: focus contract input when contract address is empty and user clicks Connect
+      // Contract address is persisted in localStorage under key marketraider_bearchecker_contract
+      // All contract calls use ethers v6; ensure BearChecker is deployed on the connected chain.
+    })();
+  </script>
+</body>
+</html>
+
