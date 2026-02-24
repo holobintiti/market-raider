@@ -273,3 +273,58 @@
         <h3>Phase summary</h3>
         <p class="text-dim" style="margin-bottom:0.5rem;">Count and score stats per phase.</p>
         <div id="phase-summary-body"></div>
+      </div>
+      <div class="card">
+        <h3>Phase thresholds (keeper-configured)</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Min/max score bounds per phase.</p>
+        <div id="phase-thresholds-body"></div>
+      </div>
+    </section>
+
+    <section id="panel-snapshots" class="panel">
+      <div class="card">
+        <h3>Cycle snapshots</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Oracle-recorded aggregate phase and bear score.</p>
+        <div id="snapshots-list"></div>
+        <div class="actions">
+          <button type="button" class="btn small" id="btn-load-snapshots">Load snapshots</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-lookup" class="panel">
+      <div class="card">
+        <h3>Lookup assessment</h3>
+        <label>Assessment ID</label>
+        <input type="number" id="lookup-id" class="input" min="1" value="1" />
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-lookup">Load</button>
+        </div>
+        <div id="lookup-result" style="margin-top:0.75rem; font-size:0.85rem;"></div>
+        <div id="lookup-msg" class="msg" style="display:none;"></div>
+      </div>
+      <div class="card">
+        <h3>My assessments</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">IDs submitted by connected wallet.</p>
+        <div id="my-ids"></div>
+      </div>
+      <div class="card">
+        <h3>Assessments by block range</h3>
+        <label>From block</label>
+        <input type="number" id="block-from" class="input" min="0" placeholder="0" />
+        <label>To block</label>
+        <input type="number" id="block-to" class="input" min="0" placeholder="0" />
+        <div class="actions">
+          <button type="button" class="btn primary" id="btn-block-range">Load IDs</button>
+        </div>
+        <div id="block-range-result" style="margin-top:0.75rem; font-size:0.85rem;"></div>
+      </div>
+    </section>
+
+    <section id="panel-config" class="panel">
+      <div class="card">
+        <h3>Config</h3>
+        <p class="text-dim" style="margin-bottom:0.75rem;">BearChecker config snapshot.</p>
+        <div class="config-grid" id="config-grid"></div>
+      </div>
+      <div class="card">
