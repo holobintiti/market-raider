@@ -658,3 +658,58 @@
             '<button type="button" class="btn small batch-remove" data-idx="' + i + '">Remove</button>';
           container.appendChild(div);
         }
+        container.querySelectorAll('.batch-remove').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            if (batchRowCount <= 1) return;
+            batchRowCount--;
+            renderBatchRows();
+          });
+        });
+      }
+      document.getElementById('btn-batch-add').addEventListener('click', function() {
+        if (batchRowCount >= 8) return;
+        batchRowCount++;
+        if (batchRowCount === 1) batchRowCount = 1;
+        renderBatchRows();
+      });
+      if (batchRowCount === 0) { batchRowCount = 1; renderBatchRows(); }
+
+      document.getElementById('btn-batch-submit').addEventListener('click', async function() {
+        var rows = document.querySelectorAll('.batch-row');
+        if (!rows.length || !contract) {
+          showMsg('batch-msg', 'Add at least one row and set contract.', 'err');
+          return;
+        }
+        var phaseIds = [], bearScores = [], riskLevels = [], metadataHashes = [];
+        for (var i = 0; i < rows.length; i++) {
+          var r = rows[i];
+          phaseIds.push(parseInt(r.querySelector('.batch-phase').value, 10) || 0);
+          bearScores.push(BigInt(r.querySelector('.batch-score').value || 0));
+          riskLevels.push(parseInt(r.querySelector('.batch-risk').value, 10) || 0);
+          metadataHashes.push('0x0000000000000000000000000000000000000000000000000000000000000000');
+        }
+        var eth = document.getElementById('batch-eth').value.trim() || '0';
+        hideMsg('batch-msg');
+        try {
+          var tx = await contract.submitAssessmentBatch(phaseIds, bearScores, riskLevels, metadataHashes, { value: BigInt(eth) });
+          showMsg('batch-msg', 'Tx: ' + tx.hash, 'ok');
+          await tx.wait();
+          showMsg('batch-msg', 'Batch submitted.', 'ok');
+          refresh();
+        } catch (e) {
+          showMsg('batch-msg', (e.message || e).toString(), 'err');
+        }
+      });
+
+      document.getElementById('btn-block-range').addEventListener('click', async function() {
+        var from = document.getElementById('block-from').value.trim();
+        var to = document.getElementById('block-to').value.trim();
+        if (!from || !to || !contract) return;
+        var result = document.getElementById('block-range-result');
+        try {
+          var ids = await contract.getAssessmentsInBlockRange(BigInt(from), BigInt(to));
+          result.innerHTML = ids.length ? ('Assessment IDs: ' + ids.join(', ')) : 'No assessments in range.';
+        } catch (e) {
+          result.innerHTML = '<span class="err">Error: ' + (e.message || e) + '</span>';
+        }
+      });
