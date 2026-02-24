@@ -218,3 +218,58 @@
           <input type="number" id="submit-risk" class="input" min="0" max="10" value="5" />
           <label>Metadata hash (optional, 0x... or leave blank)</label>
           <input type="text" id="submit-meta" class="input" placeholder="0x..." />
+          <label>ETH to send (fee, wei)</label>
+          <input type="text" id="submit-eth" class="input" placeholder="0" />
+          <p class="text-dim" style="font-size:0.8rem; margin-top:0.25rem;">Send at least the contract submission fee (see Config). Use 0 if fee is 0.</p>
+          <div class="actions">
+            <button type="button" class="btn primary" id="btn-submit">Submit</button>
+          </div>
+          <div id="submit-msg" class="msg" style="display:none;"></div>
+        </div>
+        <div class="card">
+          <h3>Cycle phases</h3>
+          <p class="text-dim" style="font-size:0.85rem;">Phase 1 Accumulation, 2 Markup, 3 Distribution, 4 Markdown. Bear score 0–10000 (higher = more bearish).</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Batch submit</h3>
+        <p class="text-dim" style="font-size:0.85rem; margin-bottom:0.75rem;">Add up to 8 rows; phase (0–7), bear score (0–10000), risk (0–10). Same fee per assessment.</p>
+        <div id="batch-rows"></div>
+        <label>Total ETH to send (wei)</label>
+        <input type="text" id="batch-eth" class="input" placeholder="0" />
+        <div class="actions">
+          <button type="button" class="btn small" id="btn-batch-add">+ Row</button>
+          <button type="button" class="btn primary" id="btn-batch-submit">Submit batch</button>
+        </div>
+        <div id="batch-msg" class="msg" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section id="panel-latest" class="panel">
+      <div class="card">
+        <h3>Latest assessments</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Most recent submissions (newest first).</p>
+        <div id="latest-list"></div>
+        <div class="actions">
+          <button type="button" class="btn small" id="btn-load-latest">Load latest 20</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Load by slice (offset / limit)</h3>
+        <label>Offset</label>
+        <input type="number" id="slice-offset" class="input" min="0" value="0" />
+        <label>Limit (max items)</label>
+        <input type="number" id="slice-limit" class="input" min="1" value="10" />
+        <div class="actions">
+          <button type="button" class="btn small" id="btn-load-slice">Load slice</button>
+        </div>
+        <p class="text-dim" style="font-size:0.8rem; margin-top:0.5rem;">Slice is from the global list (oldest at offset 0). Use offset 0, limit 20 to get oldest 20. Latest 20 uses the contract’s getLatestAssessments(20) for newest-first order.</p>
+        <div id="slice-list" style="margin-top:0.75rem;"></div>
+      </div>
+    </section>
+
+    <section id="panel-phase-summary" class="panel">
+      <div class="card">
+        <h3>Phase summary</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Count and score stats per phase.</p>
+        <div id="phase-summary-body"></div>
