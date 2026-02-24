@@ -438,3 +438,58 @@
 
       function formatWei(wei) {
         if (typeof wei === 'bigint') wei = Number(wei);
+        if (wei >= 1e18) return (wei / 1e18).toFixed(4) + ' ETH';
+        return wei + ' wei';
+      }
+
+      function escapeHtml(s) {
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function attachContract(addr) {
+        if (!provider || !addr) return;
+        contract = new ethers.Contract(addr, ABI, signer || provider);
+        setContractAddr(addr);
+      }
+
+      async function refresh() {
+        var addr = getContractAddr();
+        if (addr && !contract) attachContract(addr);
+        if (!contract) return;
+        try {
+          var r = await contract.getGlobalStats();
+          document.getElementById('stat-total').textContent = r[0].toString();
+          document.getElementById('stat-treasury').textContent = r[1].toString();
+          var cfg = await contract.getConfigSnapshot();
+          document.getElementById('stat-fee').textContent = cfg[4].toString();
+          var cnt = await contract.getCycleSnapshotCount();
+          document.getElementById('stat-snapshots').textContent = cnt.toString();
+          document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+        } catch (e) {
+          console.error(e);
+        }
+        var tab = document.querySelector('.tab.active');
+        if (tab) {
+          var tabName = tab.getAttribute('data-tab');
+          if (tabName === 'dashboard') loadDashboard();
+          if (tabName === 'phase-summary') { loadPhaseSummary(); loadPhaseThresholds(); }
+          if (tabName === 'config') loadConfig();
+          if (tabName === 'lookup' && userAddress) loadMyIds();
+        }
+      }
+
+      async function loadDashboard() {
+        var tiles = document.getElementById('dashboard-tiles');
+        var snapshotEl = document.getElementById('dashboard-latest-snapshot');
+        if (!tiles || !contract) return;
+        try {
+          var stats = await contract.getScoreStats();
+          var avg = await contract.getAverageBearScore();
+          var global = await contract.getGlobalStats();
+          var avgVal = avg[1] > 0n ? Number(avg[0]) : 0;
+          tiles.innerHTML =
+            '<div class="dashboard-tile"><div class="label">Total assessments</div><div class="value">' + global[0] + '</div></div>' +
+            '<div class="dashboard-tile"><div class="label">Score sum</div><div class="value">' + stats[0] + '</div></div>' +
+            '<div class="dashboard-tile"><div class="label">Average bear score</div><div class="value">' + Math.round(avgVal) + '</div></div>' +
