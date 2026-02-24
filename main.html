@@ -53,3 +53,58 @@
     .btn {
       font-family: 'IBM Plex Sans', sans-serif;
       font-weight: 500;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      color: var(--text);
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { filter: brightness(1.1); box-shadow: 0 0 14px var(--glow); }
+    .btn.small { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      padding: 1rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .stats span { color: var(--text-dim); }
+    .stats strong { color: var(--accent); margin-right: 0.25rem; font-family: 'IBM Plex Mono', monospace; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 1rem; }
+    .tab { padding: 0.5rem 1rem; background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-dim); cursor: pointer; border-radius: 6px; font-size: 0.9rem; }
+    .tab:hover { color: var(--text); }
+    .tab.active { border-color: var(--accent); color: var(--accent); }
+    .panel { display: none; }
+    .panel.visible { display: block; }
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .card h3 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--accent); }
+    .card h4 { font-size: 0.9rem; margin: 0.75rem 0 0.5rem; color: var(--text-dim); }
+    label { display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.25rem; }
+    .input, select {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+    .row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .row .card { flex: 1; min-width: 260px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
