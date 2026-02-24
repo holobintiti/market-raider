@@ -548,3 +548,58 @@
       async function loadLatest() {
         var list = document.getElementById('latest-list');
         if (!list || !contract) return;
+        try {
+          var r = await contract.getLatestAssessments(20);
+          var ids = r[0], submitters = r[1], phaseIds = r[2], bearScores = r[3], riskLevels = r[4];
+          if (ids.length === 0) {
+            list.innerHTML = '<p class="text-dim">No assessments.</p>';
+            return;
+          }
+          list.innerHTML = '';
+          for (var i = 0; i < ids.length; i++) {
+            var li = document.createElement('li');
+            li.innerHTML = '<span class="phase-badge phase-' + phaseIds[i] + '">#' + ids[i] + ' P' + phaseIds[i] + '</span> bear ' + bearScores[i] + ' risk ' + riskLevels[i] +
+              '<div class="meta">' + submitters[i] + '</div>';
+            list.appendChild(li);
+          }
+        } catch (e) {
+          list.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+        }
+      }
+
+      async function loadSlice() {
+        var list = document.getElementById('slice-list');
+        if (!list || !contract) return;
+        var offset = document.getElementById('slice-offset').value.trim() || '0';
+        var limit = document.getElementById('slice-limit').value.trim() || '10';
+        try {
+          var r = await contract.getAssessmentSlice(BigInt(offset), BigInt(limit));
+          var ids = r[0], submitters = r[1], phaseIds = r[2], bearScores = r[3], riskLevels = r[4], atBlocks = r[5];
+          if (ids.length === 0) {
+            list.innerHTML = '<p class="text-dim">No assessments in this slice.</p>';
+            return;
+          }
+          list.innerHTML = '';
+          for (var i = 0; i < ids.length; i++) {
+            var li = document.createElement('li');
+            li.innerHTML = '<span class="phase-badge phase-' + phaseIds[i] + '">#' + ids[i] + ' P' + phaseIds[i] + '</span> bear ' + bearScores[i] + ' risk ' + riskLevels[i] + ' block ' + atBlocks[i] +
+              '<div class="meta">' + submitters[i] + '</div>';
+            list.appendChild(li);
+          }
+        } catch (e) {
+          list.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+        }
+      }
+
+      async function loadSnapshots() {
+        var list = document.getElementById('snapshots-list');
+        if (!list || !contract) return;
+        try {
+          var count = await contract.getCycleSnapshotCount();
+          if (count === 0n) {
+            list.innerHTML = '<p class="text-dim">No snapshots.</p>';
+            return;
+          }
+          var r = await contract.getCycleSnapshotsPaginated(0, Number(count > 50n ? 50n : count));
+          var phaseIds = r[0], scores = r[1], blocks = r[2];
+          list.innerHTML = '';
