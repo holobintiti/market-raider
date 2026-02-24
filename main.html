@@ -328,3 +328,58 @@
         <div class="config-grid" id="config-grid"></div>
       </div>
       <div class="card">
+        <h3>Contract constants (reference)</h3>
+        <p class="text-dim" style="margin-bottom:0.5rem;">Fixed values on the BearChecker contract.</p>
+        <div class="constants-list">
+          <div><span class="k">BCH_SCORE_SCALE</span><div class="v">10000</div></div>
+          <div><span class="k">BCH_MAX_PHASES</span><div class="v">8</div></div>
+          <div><span class="k">BCH_MAX_RISK_LEVEL</span><div class="v">10</div></div>
+          <div><span class="k">BCH_MAX_ASSESSMENTS_PER_SUBMITTER</span><div class="v">256</div></div>
+          <div><span class="k">BCH_PHASE_ACCUMULATION</span><div class="v">1</div></div>
+          <div><span class="k">BCH_PHASE_MARKUP</span><div class="v">2</div></div>
+          <div><span class="k">BCH_PHASE_DISTRIBUTION</span><div class="v">3</div></div>
+          <div><span class="k">BCH_PHASE_MARKDOWN</span><div class="v">4</div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="card">
+      <h3>Help</h3>
+      <p class="help-toggle" id="help-toggle">▼ Show usage and phase reference</p>
+      <div class="help-body" id="help-body" style="display:none;">
+        <p><strong>Phases:</strong> 0 = Other, 1 = Accumulation, 2 = Markup, 3 = Distribution, 4 = Markdown (5–7 reserved). Bear score 0–10000 (higher = more bearish). Risk level 0–10.</p>
+        <p><strong>Submit:</strong> Enter phase, bear score, risk; optionally metadata hash (0x64 hex or any string, will be hashed) and ETH for fee. Batch submit allows multiple rows; fee is per assessment.</p>
+        <p><strong>Dashboard:</strong> Aggregate score stats and latest oracle snapshot. Phase summary shows count/sum/min/max per phase; Phase thresholds show keeper-configured min/max bounds.</p>
+        <p><strong>Lookup:</strong> Load a single assessment by ID. My assessments lists IDs from the connected wallet. Block range returns assessment IDs submitted in the given block range.</p>
+        <p><strong>Config:</strong> Treasury, keeper, oracle, deploy block, fee, counter, treasury balance, paused flag. Connect wallet and set BearChecker contract address to use all features.</p>
+        <p><strong>Snapshots:</strong> Oracle (or owner) can record cycle snapshots via the contract; they appear under Snapshots and in the Dashboard as latest snapshot.</p>
+        <p><strong>Batch:</strong> Add rows for phase/score/risk; total ETH must cover (fee × number of rows). Max 8 rows per batch and 256 assessments per submitter in total.</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>market-raider — BearChecker UI. Submit market-cycle assessments (phase, bear score, risk level). Keeper sets phase thresholds; oracle can record snapshots.</p>
+      <p style="margin-top:0.5rem;">Use Connect to link your wallet; enter the deployed BearChecker contract address above. All data is read from or written to the contract on the connected chain.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      const STORAGE_KEY = 'marketraider_bearchecker_contract';
+      const ABI = [
+        'function submitAssessment(uint8 phaseId, uint256 bearScore, uint8 riskLevel, bytes32 metadataHash) payable returns (uint256)',
+        'function submitAssessmentBatch(uint8[] phaseIds, uint256[] bearScores, uint8[] riskLevels, bytes32[] metadataHashes) payable returns (uint256[])',
+        'function getAssessment(uint256) view returns (address, uint8 phaseId, uint256 bearScore, uint8 riskLevel, bytes32 metadataHash, uint256 atBlock)',
+        'function getLatestAssessments(uint256 count) view returns (uint256[] ids, address[] submitters, uint8[] phaseIds, uint256[] bearScores, uint8[] riskLevels)',
+        'function getPhaseSummary() view returns ((uint8 phaseId, uint256 count, uint256 sumScore, uint256 minScore, uint256 maxScore, bool configured)[] entries)',
+        'function getPhaseThresholdsBatch(uint8[] phaseIds) view returns (uint256[] minScores, uint256[] maxScores, bool[] configured)',
+        'function getCycleSnapshot(uint256 index) view returns (uint8 phaseId, uint256 aggregateBearScore, uint256 atBlock)',
+        'function getCycleSnapshotCount() view returns (uint256)',
+        'function getCycleSnapshotsPaginated(uint256 offset, uint256 limit) view returns (uint8[] phaseIds, uint256[] aggregateBearScores, uint256[] atBlocks)',
+        'function getLatestCycleSnapshot() view returns (uint8 phaseId, uint256 aggregateBearScore, uint256 atBlock)',
+        'function getAssessmentIdsBySubmitter(address) view returns (uint256[])',
+        'function getConfigSnapshot() view returns (address, address, address, uint256, uint256, uint256, uint256, bool)',
+        'function getGlobalStats() view returns (uint256 totalAssessments, uint256 totalTreasury, uint256 allIdsLength)',
+        'function getScoreStats() view returns (uint256 sum, uint256 count, uint256 minScore, uint256 maxScore)',
+        'function getAverageBearScore() view returns (uint256 average, uint256 count)',
+        'function getAssessmentsInBlockRange(uint256 fromBlock, uint256 toBlock) view returns (uint256[] ids)',
