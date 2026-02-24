@@ -493,3 +493,58 @@
             '<div class="dashboard-tile"><div class="label">Total assessments</div><div class="value">' + global[0] + '</div></div>' +
             '<div class="dashboard-tile"><div class="label">Score sum</div><div class="value">' + stats[0] + '</div></div>' +
             '<div class="dashboard-tile"><div class="label">Average bear score</div><div class="value">' + Math.round(avgVal) + '</div></div>' +
+            '<div class="dashboard-tile"><div class="label">Min / max score</div><div class="value">' + stats[2] + ' / ' + stats[3] + '</div></div>' +
+            '<div class="dashboard-tile"><div class="label">Treasury</div><div class="value">' + formatWei(global[1]) + '</div></div>';
+          try {
+            var latest = await contract.getLatestCycleSnapshot();
+            snapshotEl.innerHTML = '<p><strong>Latest snapshot:</strong> phase ' + latest[0] + ', aggregate score ' + latest[1] + ', block ' + latest[2] + '</p>';
+          } catch (_) {
+            snapshotEl.innerHTML = '<p class="text-dim">No cycle snapshots yet.</p>';
+          }
+        } catch (e) {
+          tiles.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+          snapshotEl.innerHTML = '';
+        }
+      }
+
+      async function loadPhaseThresholds() {
+        var body = document.getElementById('phase-thresholds-body');
+        if (!body || !contract) return;
+        try {
+          var phaseIds = [0, 1, 2, 3, 4, 5, 6, 7];
+          var r = await contract.getPhaseThresholdsBatch(phaseIds);
+          var names = ['Other', 'Accumulation', 'Markup', 'Distribution', 'Markdown', 'Phase 5', 'Phase 6', 'Phase 7'];
+          var html = '<table><tr><th>Phase</th><th>Min</th><th>Max</th><th>Configured</th></tr>';
+          for (var i = 0; i < phaseIds.length; i++) {
+            html += '<tr><td>' + phaseIds[i] + ' ' + names[i] + '</td><td>' + r[0][i] + '</td><td>' + r[1][i] + '</td><td>' + (r[2][i] ? 'Yes' : 'No') + '</td></tr>';
+          }
+          html += '</table>';
+          body.innerHTML = html;
+        } catch (e) {
+          body.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+        }
+      }
+
+      async function loadPhaseSummary() {
+        var body = document.getElementById('phase-summary-body');
+        if (!body || !contract) return;
+        try {
+          var entries = await contract.getPhaseSummary();
+          var phaseNames = ['Other', 'Accumulation', 'Markup', 'Distribution', 'Markdown'];
+          var html = '<div class="config-grid">';
+          for (var i = 0; i < entries.length; i++) {
+            var e = entries[i];
+            var avg = e.count > 0n ? Number(e.sumScore) / Number(e.count) : 0;
+            html += '<div class="config-item"><span class="k">Phase ' + e.phaseId + ' ' + (phaseNames[e.phaseId] || '') + '</span>';
+            html += '<div class="v">count ' + e.count + ', avg ' + Math.round(avg) + ', min ' + e.minScore + ', max ' + e.maxScore + (e.configured ? ', configured' : '') + '</div></div>';
+          }
+          html += '</div>';
+          body.innerHTML = html;
+        } catch (e) {
+          body.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+        }
+      }
+
+      async function loadLatest() {
+        var list = document.getElementById('latest-list');
+        if (!list || !contract) return;
