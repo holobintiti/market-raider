@@ -713,3 +713,58 @@
           result.innerHTML = '<span class="err">Error: ' + (e.message || e) + '</span>';
         }
       });
+
+      document.getElementById('btn-connect').addEventListener('click', connect);
+      document.getElementById('btn-refresh').addEventListener('click', refresh);
+      document.getElementById('contract-address').addEventListener('change', function() {
+        var a = this.value.trim();
+        if (a) attachContract(a);
+      });
+      document.getElementById('btn-copy-contract').addEventListener('click', function() {
+        var a = document.getElementById('contract-address').value.trim();
+        if (!a) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(a).then(function() { showMsg('submit-msg', 'Contract address copied.', 'ok'); }).catch(function() {});
+        }
+      });
+
+      document.getElementById('btn-submit').addEventListener('click', async function() {
+        var phase = parseInt(document.getElementById('submit-phase').value, 10);
+        var score = document.getElementById('submit-score').value.trim();
+        var risk = document.getElementById('submit-risk').value.trim();
+        var meta = document.getElementById('submit-meta').value.trim();
+        var eth = document.getElementById('submit-eth').value.trim() || '0';
+        if (!contract) {
+          showMsg('submit-msg', 'Set contract.', 'err');
+          return;
+        }
+        var metaHash = '0x0000000000000000000000000000000000000000000000000000000000000000';
+        if (meta && meta.startsWith('0x') && meta.length === 66) metaHash = meta;
+        else if (meta) metaHash = ethers.keccak256(ethers.toUtf8Bytes(meta));
+        hideMsg('submit-msg');
+        try {
+          var tx = await contract.submitAssessment(phase, BigInt(score), parseInt(risk, 10), metaHash, { value: BigInt(eth) });
+          showMsg('submit-msg', 'Tx: ' + tx.hash, 'ok');
+          await tx.wait();
+          showMsg('submit-msg', 'Assessment submitted.', 'ok');
+          refresh();
+        } catch (e) {
+          showMsg('submit-msg', (e.message || e).toString(), 'err');
+        }
+      });
+
+      document.getElementById('btn-load-latest').addEventListener('click', loadLatest);
+      document.getElementById('btn-load-slice').addEventListener('click', loadSlice);
+      document.getElementById('btn-load-snapshots').addEventListener('click', loadSnapshots);
+
+      document.getElementById('btn-lookup').addEventListener('click', async function() {
+        var id = document.getElementById('lookup-id').value.trim();
+        if (!id || !contract) return;
+        var result = document.getElementById('lookup-result');
+        hideMsg('lookup-msg');
+        try {
+          var r = await contract.getAssessment(id);
+          result.innerHTML = '<div class="config-grid">' +
+            '<div class="config-item"><span class="k">Submitter</span><div class="v">' + escapeHtml(r[0]) + '</div></div>' +
+            '<div class="config-item"><span class="k">Phase</span><div class="v">' + r[1] + '</div></div>' +
+            '<div class="config-item"><span class="k">Bear score</span><div class="v">' + r[2] + '</div></div>' +
