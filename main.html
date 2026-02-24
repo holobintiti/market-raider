@@ -603,3 +603,58 @@
           var r = await contract.getCycleSnapshotsPaginated(0, Number(count > 50n ? 50n : count));
           var phaseIds = r[0], scores = r[1], blocks = r[2];
           list.innerHTML = '';
+          for (var i = 0; i < phaseIds.length; i++) {
+            var li = document.createElement('li');
+            li.innerHTML = 'Phase ' + phaseIds[i] + ' · aggregate score ' + scores[i] + ' · block ' + blocks[i];
+            list.appendChild(li);
+          }
+        } catch (e) {
+          list.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+        }
+      }
+
+      async function loadConfig() {
+        var grid = document.getElementById('config-grid');
+        if (!grid || !contract) return;
+        try {
+          var r = await contract.getConfigSnapshot();
+          grid.innerHTML =
+            '<div class="config-item"><span class="k">Treasury</span><div class="v">' + r[0] + '</div></div>' +
+            '<div class="config-item"><span class="k">Keeper</span><div class="v">' + r[1] + '</div></div>' +
+            '<div class="config-item"><span class="k">Oracle</span><div class="v">' + r[2] + '</div></div>' +
+            '<div class="config-item"><span class="k">Deploy block</span><div class="v">' + r[3] + '</div></div>' +
+            '<div class="config-item"><span class="k">Submission fee (wei)</span><div class="v">' + r[4] + '</div></div>' +
+            '<div class="config-item"><span class="k">Assessment counter</span><div class="v">' + r[5] + '</div></div>' +
+            '<div class="config-item"><span class="k">Treasury balance</span><div class="v">' + r[6] + '</div></div>' +
+            '<div class="config-item"><span class="k">Paused</span><div class="v">' + (r[7] ? 'Yes' : 'No') + '</div></div>';
+        } catch (e) {
+          grid.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+        }
+      }
+
+      async function loadMyIds() {
+        var el = document.getElementById('my-ids');
+        if (!el || !userAddress || !contract) return;
+        try {
+          var ids = await contract.getAssessmentIdsBySubmitter(userAddress);
+          if (ids.length === 0) el.innerHTML = '<p class="text-dim">None.</p>';
+          else el.innerHTML = '<p>' + ids.map(function(id) { return '#' + id; }).join(', ') + '</p>';
+        } catch (e) {
+          el.innerHTML = '<p class="text-dim">Error: ' + (e.message || e) + '</p>';
+        }
+      }
+
+      var batchRowCount = 0;
+      function renderBatchRows() {
+        var container = document.getElementById('batch-rows');
+        if (!container) return;
+        container.innerHTML = '';
+        for (var i = 0; i < batchRowCount; i++) {
+          var div = document.createElement('div');
+          div.className = 'batch-row';
+          div.innerHTML = '<input type="number" class="input batch-phase" min="0" max="7" placeholder="Phase" value="0" />' +
+            '<input type="number" class="input batch-score" min="0" max="10000" placeholder="Score" value="5000" />' +
+            '<input type="number" class="input batch-risk" min="0" max="10" placeholder="Risk" value="5" />' +
+            '<button type="button" class="btn small batch-remove" data-idx="' + i + '">Remove</button>';
+          container.appendChild(div);
+        }
